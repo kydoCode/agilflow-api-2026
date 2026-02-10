@@ -30,7 +30,7 @@ const register = async (req, res) => {
     
     res.status(201).json({ 
       token, 
-      user: { id: user.id, name: user.name, email: user.email, role: user.role } 
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, createdAt: user.createdAt } 
     });
   } catch (error) {
     logger.error({ err: error }, 'Erreur inscription');
@@ -63,7 +63,7 @@ const login = async (req, res) => {
     
     res.json({ 
       token, 
-      user: { id: user.id, name: user.name, email: user.email, role: user.role } 
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, createdAt: user.createdAt } 
     });
   } catch (error) {
     logger.error({ err: error }, 'Erreur connexion');
