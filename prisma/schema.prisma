@@ -19,6 +19,19 @@ model User {
   userStories UserStory[]
 }
 
+model Sprint {
+  id          Int      @id @default(autoincrement())
+  name        String
+  goal        String?  @db.Text
+  startDate   DateTime
+  endDate     DateTime
+  status      String   @default("planned") // planned, active, completed
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userStories UserStory[]
+}
+
 model UserStory {
   id          Int      @id @default(autoincrement())
   title       String
@@ -26,10 +39,13 @@ model UserStory {
   priority    String   @default("Medium")
   status      String   @default("Todo")
   userId      Int
+  sprintId    Int?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sprint Sprint? @relation(fields: [sprintId], references: [id], onDelete: SetNull)
   
   @@index([userId])
+  @@index([sprintId])
 }
