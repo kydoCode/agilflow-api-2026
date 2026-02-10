@@ -1,123 +1,204 @@
-# 🔧 AgilFlow Backend API
+# AgilFlow Backend API
 
-API REST pour la gestion de User Stories avec authentification JWT.
+API REST pour gérer les User Stories et l'authentification des utilisateurs.
 
-## 🚀 Stack Technique
+## Prérequis
 
-- **Runtime** : Node.js 20+ (ES6 Modules)
-- **Framework** : Express 5
-- **Base de données** : PostgreSQL (Neon)
-- **ORM** : Prisma
-- **Validation** : Zod
-- **Logger** : Pino
-- **Documentation** : OpenAPI 3.1
-- **Auth** : JWT + Bcrypt
+- Node.js 20.19+ ou 22.12+
+- PostgreSQL (ou compte Neon gratuit)
+- npm ou yarn
 
-## 📦 Installation
+## Installation
+
+1. Cloner le repository
+2. Installer les dépendances :
 
 ```bash
 npm install
 ```
 
-## ⚙️ Configuration
+3. Créer un fichier `.env` à la racine :
 
-```bash
-cp .env.example .env
-```
-
-Éditer `.env` avec vos variables :
 ```env
-DATABASE_URL="postgresql://user:pass@host/db?sslmode=require"
-JWT_SECRET="your-secret-key"
+DATABASE_URL="postgresql://user:password@host/database?sslmode=require"
+JWT_SECRET="votre-cle-secrete-minimum-32-caracteres"
 PORT=3000
 FRONTEND_URL="http://localhost:5173"
+NODE_ENV="development"
 ```
 
-## 🗄️ Base de données
+**Important** : Pour un déploiement serverless (Vercel), utiliser une URL de connexion avec `-pooler` dans le nom d'hôte Neon.
+
+4. Initialiser la base de données :
 
 ```bash
-# Générer le client Prisma
 npx prisma generate
-
-# Créer et appliquer les migrations
 npx prisma migrate dev --name init
-
-# Ouvrir Prisma Studio (optionnel)
-npx prisma studio
 ```
 
-## 🏃 Développement
+## Lancer l'API
+
+### Mode développement
 
 ```bash
 npm run dev
 ```
 
-API disponible sur `http://localhost:3000`
+L'API sera accessible sur `http://localhost:3000`
 
-## 📚 Documentation API
-
-OpenAPI JSON : `http://localhost:3000/api/docs.json`
-
-Importer dans Postman/Insomnia pour tester l'API.
-
-## 🔐 Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Inscription
-- `POST /api/auth/login` - Connexion
-
-### User Stories (protégé JWT)
-- `GET /api/userstories` - Liste
-- `POST /api/userstories` - Créer
-- `PUT /api/userstories/:id` - Modifier
-- `DELETE /api/userstories/:id` - Supprimer
-
-## 🧪 Tests
+### Mode production
 
 ```bash
-npm test
+npm start
 ```
 
-## 🚀 Déploiement Vercel
+## Utiliser l'API
 
-1. Créer projet Vercel
-2. Connecter repo GitHub
-3. Ajouter variables d'environnement
-4. Deploy automatique sur push
+### Documentation interactive
 
-## 📝 Scripts
-
-- `npm run dev` - Serveur développement (nodemon)
-- `npm start` - Serveur production
-- `npm run prisma:generate` - Générer client Prisma
-- `npm run prisma:migrate` - Appliquer migrations
-- `npm run prisma:studio` - Interface DB
-
-## 🏗️ Structure
-
+La documentation OpenAPI est disponible au format JSON :
 ```
-back/
-├── src/
-│   ├── config/          # Configuration (logger, swagger)
-│   ├── controllers/     # Logique métier
-│   ├── middleware/      # Middlewares (auth, validation)
-│   ├── routes/          # Routes Express
-│   ├── validators/      # Schémas Zod
-│   └── server.js        # Point d'entrée
-├── prisma/
-│   └── schema.prisma    # Schéma base de données
-└── package.json
+http://localhost:3000/api/docs.json
 ```
 
-## 🔒 Sécurité
+Importer ce fichier dans Postman, Insomnia ou tout client REST pour tester les endpoints.
 
-- ✅ Passwords hashés (bcrypt)
-- ✅ JWT tokens
-- ✅ Validation Zod
-- ✅ CORS configuré
-- ✅ Variables sensibles en .env
-- ✅ SQL injection protection (Prisma)
+### Endpoints disponibles
 
-## 📄 Licence
+#### Authentification
 
-Projet formation DWWM 2025
+**Inscription**
+```
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Jean Dupont",
+  "email": "jean@example.com",
+  "password": "motdepasse123",
+  "role": "developer"
+}
+```
+
+Rôles disponibles : `productOwner`, `scrumMaster`, `developer`, `tester`, `designer`, `stakeholder`, `teammate`
+
+**Connexion**
+```
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "jean@example.com",
+  "password": "motdepasse123"
+}
+```
+
+Retourne un token JWT à utiliser pour les requêtes protégées.
+
+#### User Stories (authentification requise)
+
+**Lister vos User Stories**
+```
+GET /api/userstories
+Authorization: Bearer VOTRE_TOKEN_JWT
+```
+
+**Créer une User Story**
+```
+POST /api/userstories
+Authorization: Bearer VOTRE_TOKEN_JWT
+Content-Type: application/json
+
+{
+  "title": "En tant que utilisateur, je veux me connecter",
+  "description": "Afin d'accéder à mon compte",
+  "priority": "High",
+  "status": "Todo"
+}
+```
+
+Priorités : `Low`, `Medium`, `High`  
+Statuts : `Todo`, `Doing`, `Done`
+
+**Modifier une User Story**
+```
+PUT /api/userstories/:id
+Authorization: Bearer VOTRE_TOKEN_JWT
+Content-Type: application/json
+
+{
+  "title": "Titre modifié",
+  "description": "Description modifiée",
+  "priority": "Medium",
+  "status": "Doing"
+}
+```
+
+**Supprimer une User Story**
+```
+DELETE /api/userstories/:id
+Authorization: Bearer VOTRE_TOKEN_JWT
+```
+
+#### Mot de passe
+
+**Changer le mot de passe**
+```
+PUT /api/password/change
+Authorization: Bearer VOTRE_TOKEN_JWT
+Content-Type: application/json
+
+{
+  "oldPassword": "ancien",
+  "newPassword": "nouveau"
+}
+```
+
+## Base de données
+
+### Visualiser les données
+
+```bash
+npx prisma studio
+```
+
+Ouvre une interface web pour consulter et modifier les données.
+
+### Créer une nouvelle migration
+
+Après modification du fichier `prisma/schema.prisma` :
+
+```bash
+npx prisma migrate dev --name nom_de_la_migration
+```
+
+## Sécurité
+
+- Les mots de passe sont hashés avec bcrypt
+- Les tokens JWT expirent après 24h
+- Toutes les entrées sont validées avec Zod
+- Protection contre les injections SQL via Prisma ORM
+- CORS configuré pour autoriser uniquement le frontend
+
+## Déploiement
+
+L'API peut être déployée sur Vercel, Railway, Render ou tout hébergeur Node.js.
+
+**Variables d'environnement à configurer** :
+- `DATABASE_URL` : URL PostgreSQL (avec `-pooler` pour serverless)
+- `JWT_SECRET` : Clé secrète pour les tokens
+- `FRONTEND_URL` : URL du frontend pour CORS
+- `NODE_ENV` : `production`
+
+## Technologies utilisées
+
+- Express 5
+- Prisma ORM
+- PostgreSQL
+- JWT pour l'authentification
+- Zod pour la validation
+- Pino pour les logs
+
+## Licence
+
+Projet fil rouge TP DWWM 2024/2025
