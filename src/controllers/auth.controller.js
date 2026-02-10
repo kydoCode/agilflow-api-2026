@@ -12,7 +12,7 @@ const prisma = new PrismaClient();
  */
 const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -21,7 +21,7 @@ const register = async (req, res) => {
     
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword }
+      data: { name, email, password: hashedPassword, role: role || 'teammate' }
     });
     
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
@@ -30,7 +30,7 @@ const register = async (req, res) => {
     
     res.status(201).json({ 
       token, 
-      user: { id: user.id, name: user.name, email: user.email } 
+      user: { id: user.id, name: user.name, email: user.email, role: user.role } 
     });
   } catch (error) {
     logger.error({ err: error }, 'Erreur inscription');
@@ -63,7 +63,7 @@ const login = async (req, res) => {
     
     res.json({ 
       token, 
-      user: { id: user.id, name: user.name, email: user.email } 
+      user: { id: user.id, name: user.name, email: user.email, role: user.role } 
     });
   } catch (error) {
     logger.error({ err: error }, 'Erreur connexion');
