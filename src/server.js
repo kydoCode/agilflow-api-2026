@@ -38,6 +38,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  logger.info(`🚀 Server running on http://localhost:${PORT}`);
+  logger.info(`Server running on http://localhost:${PORT}`);
   logger.info(`📚 API Docs: http://localhost:${PORT}/api/docs.json`);
 });
