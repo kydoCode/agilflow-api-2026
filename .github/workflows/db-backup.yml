@@ -1,0 +1,47 @@
+name: DB Backup
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Tous les jours à 2h du matin (UTC)
+  workflow_dispatch: # Permet déclenchement manuel
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Install PostgreSQL Client 17
+        run: |
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Run pg_dump
+        run: |
+          TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+          pg_dump "${{ secrets.NEON_DATABASE_URL }}" > backup_${TIMESTAMP}.sql
+          
+          # Afficher infos backup
+          echo "📦 Backup créé: backup_${TIMESTAMP}.sql"
+          ls -lh backup_*.sql
+          wc -l backup_*.sql
+        
+      - name: Upload Backup Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: db-backup-${{ github.run_id }}
+          path: backup_*.sql
+          retention-days: 7
+          
+      - name: Notify Success
+        if: success()
+        run: |
+          echo "✅ Backup DB réussi"
+          echo "📍 Disponible dans Actions > Artifacts pendant 7 jours"
+        
+      - name: Notify Failure
+        if: failure()
+        run: |
+          echo "❌ Backup DB échoué"
+          echo "🔍 Vérifier les logs ci-dessus"
