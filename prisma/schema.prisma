@@ -15,7 +15,7 @@ model Sprint {
   endDate   DateTime
   status    String      @default("planned")
   createdAt DateTime    @default(now())
-  updatedAt DateTime
+  updatedAt DateTime    @updatedAt
   UserStory UserStory[]
 }
 
@@ -25,7 +25,7 @@ model User {
   email     String      @unique
   password  String
   createdAt DateTime    @default(now())
-  updatedAt DateTime
+  updatedAt DateTime    @updatedAt
   role      String      @default("teammate")
   UserStory UserStory[]
 }
@@ -36,7 +36,7 @@ model UserStory {
   description String?
   userId      Int
   createdAt   DateTime          @default(now())
-  updatedAt   DateTime
+  updatedAt   DateTime          @updatedAt
   sprintId    Int?
   status      UserStoryStatus   @default(BACKLOG)
   priority    UserStoryPriority @default(Medium)
