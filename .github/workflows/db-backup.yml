@@ -16,14 +16,12 @@ jobs:
           wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo apt-get update
           sudo apt-get install -y postgresql-client-17
+          /usr/lib/postgresql/17/bin/pg_dump --version
 
       - name: Run pg_dump
         run: |
           TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-          pg_dump "${{ secrets.NEON_DATABASE_URL }}" > backup_${TIMESTAMP}.sql
-          
-          # Afficher infos backup
-          echo "📦 Backup créé: backup_${TIMESTAMP}.sql"
+          /usr/lib/postgresql/17/bin/pg_dump "${{ secrets.NEON_DATABASE_URL }}" > backup_${TIMESTAMP}.sql
           ls -lh backup_*.sql
           wc -l backup_*.sql
         
