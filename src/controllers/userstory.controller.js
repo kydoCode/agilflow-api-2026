@@ -47,7 +47,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, priority, status } = req.body;
+    const { title, description, priority, status, position } = req.body;
     
     const story = await prisma.userStory.findFirst({
       where: { id: parseInt(id), userId: req.userId }
@@ -59,13 +59,36 @@ const update = async (req, res) => {
     
     const updated = await prisma.userStory.update({
       where: { id: parseInt(id) },
-      data: { title, description, priority, status }
+      data: { title, description, priority, status, position }
     });
     
     res.json(updated);
   } catch (error) {
     logger.error({ err: error }, 'Erreur mise à jour story');
     res.status(500).json({ error: 'Erreur lors de la mise à jour' });
+  }
+};
+
+const updateStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, position } = req.body;
+
+    const story = await prisma.userStory.findFirst({
+      where: { id: parseInt(id), userId: req.userId }
+    });
+
+    if (!story) return res.status(404).json({ error: 'User Story non trouvée' });
+
+    const updated = await prisma.userStory.update({
+      where: { id: parseInt(id) },
+      data: { status, ...(position !== undefined && { position }) }
+    });
+
+    res.json(updated);
+  } catch (error) {
+    logger.error({ err: error }, 'Erreur update status story');
+    res.status(500).json({ error: 'Erreur lors de la mise à jour du statut' });
   }
 };
 
@@ -94,4 +117,4 @@ const remove = async (req, res) => {
   }
 };
 
-export { getAll, create, update, remove };
+export { getAll, create, update, updateStatus, remove };
