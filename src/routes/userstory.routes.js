@@ -1,5 +1,5 @@
 import express from 'express';
-import { getAll, create, update, remove } from '../controllers/userstory.controller.js';
+import { getAll, create, update, updateStatus, remove } from '../controllers/userstory.controller.js';
 import authMiddleware from '../middleware/auth.middleware.js';
 import { validate } from '../middleware/validate.middleware.js';
 import { userStorySchema } from '../validators/schemas.js';
@@ -79,6 +79,7 @@ router.post('/', validate(userStorySchema), create);
  *         description: User Story mise à jour
  */
 router.put('/:id', validate(userStorySchema), update);
+router.patch('/:id/status', updateStatus);
 
 /**
  * @openapi
