@@ -35,7 +35,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options('/(.*)', cors(corsOptions));
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') return res.status(204).end();
+  next();
+});
 
 app.use(express.json());
 
