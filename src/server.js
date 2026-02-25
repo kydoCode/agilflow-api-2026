@@ -16,7 +16,8 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:5173',
       'https://agilflow.app',
-      'https://www.agilflow.app'
+      'https://www.agilflow.app',
+      ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [])
     ];
     
     if (!origin || allowedOrigins.includes(origin)) {
