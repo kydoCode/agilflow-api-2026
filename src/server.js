@@ -14,7 +14,6 @@ const PORT = process.env.PORT || 3000;
 const corsOptions = {
   origin: function (origin, callback) {
     const extra = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim()) : [];
-    console.log('[CORS] origin:', origin, '| extra:', extra);
     const allowedOrigins = [
       'http://localhost:5173',
       'https://agilflow.app',
