@@ -22,7 +22,7 @@ jobs:
           PARENT_ID=$(echo $BRANCHES | jq -r '.branches[] | select(.name=="main") | .id')
 
           if [ -z "$PARENT_ID" ] || [ "$PARENT_ID" = "null" ]; then
-            echo "❌ Branche main introuvable"
+            echo "Erreur: branche main introuvable"
             exit 1
           fi
 
@@ -31,7 +31,7 @@ jobs:
       - name: Create Neon branch
         id: create-branch
         run: |
-          echo "🚀 Création branche DB pour PR #${{ github.event.number }}"
+          echo "Creation branche DB pour PR #${{ github.event.number }}"
 
           RESPONSE=$(curl -s -X POST \
             "https://console.neon.tech/api/v2/projects/${{ secrets.NEON_PROJECT_ID }}/branches" \
@@ -50,27 +50,27 @@ jobs:
           BRANCH_ID=$(echo $RESPONSE | jq -r '.branch.id')
 
           if [ -z "$BRANCH_ID" ] || [ "$BRANCH_ID" = "null" ]; then
-            echo "❌ Erreur création branche"
+            echo "Erreur: creation branche echouee"
             exit 1
           fi
 
           echo "BRANCH_ID=$BRANCH_ID" >> $GITHUB_ENV
-          echo "✅ Branche créée : pr-${{ github.event.number }}"
+          echo "Branche creee : pr-${{ github.event.number }}"
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            ## 🗄️ Base de données éphémère créée
+            ## Base de donnees ephemere creee
 
             **Branche Neon** : `pr-${{ github.event.number }}`
 
-            ### 🧪 Pour tester localement :
+            ### Pour tester localement :
             1. Dans ton `.env` local :
                ```bash
-               DATABASE_URL="<récupérer depuis Neon console, branche pr-${{ github.event.number }}>"
+               DATABASE_URL="<recuperer depuis Neon console, branche pr-${{ github.event.number }}>"
                ```
             2. `npx prisma migrate deploy && npm run dev`
 
-            ⚠️ Cette branche sera **automatiquement supprimée** à la fermeture de la PR.
+            Cette branche sera **automatiquement supprimee** a la fermeture de la PR.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -15,7 +15,7 @@ jobs:
       - name: Delete Neon branch
         run: |
           BRANCH_NAME="pr-${{ github.event.number }}"
-          echo "🗑️ Suppression branche DB : $BRANCH_NAME"
+          echo "Suppression branche DB : $BRANCH_NAME"
 
           BRANCHES=$(curl -s \
             "https://console.neon.tech/api/v2/projects/${{ secrets.NEON_PROJECT_ID }}/branches" \
@@ -24,7 +24,7 @@ jobs:
           BRANCH_ID=$(echo $BRANCHES | jq -r ".branches[] | select(.name==\"$BRANCH_NAME\") | .id")
 
           if [ -z "$BRANCH_ID" ] || [ "$BRANCH_ID" = "null" ]; then
-            echo "⚠️ Branche $BRANCH_NAME introuvable (déjà supprimée ?)"
+            echo "Branche $BRANCH_NAME introuvable (deja supprimee ?)"
             exit 0
           fi
 
@@ -32,14 +32,14 @@ jobs:
             "https://console.neon.tech/api/v2/projects/${{ secrets.NEON_PROJECT_ID }}/branches/$BRANCH_ID" \
             -H "Authorization: Bearer ${{ secrets.NEON_API_KEY }}"
 
-          echo "✅ Branche $BRANCH_NAME supprimée"
+          echo "Branche $BRANCH_NAME supprimee"
 
       - name: Comment PR
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
-            ## 🗑️ Branche DB nettoyée
+            ## Branche DB nettoyee
 
-            La branche Neon `pr-${{ github.event.number }}` a été supprimée.
-            Quota disponible restauré ✅
+            La branche Neon `pr-${{ github.event.number }}` a ete supprimee.
+            Quota disponible restaure.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
