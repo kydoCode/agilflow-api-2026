@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
  * @param {import('express').Response} res
  * @param {import('express').NextFunction} next
  */
-const authMiddleware = (req, res, next) => {
+export const authenticate = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
   
   if (!token) {
@@ -22,5 +22,4 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-export default authMiddleware;
-export { authMiddleware as authenticate };
+export default authenticate;
