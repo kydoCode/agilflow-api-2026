@@ -1,0 +1,76 @@
+name: Neon Branch on PR
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  create-db-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get main branch ID
+        id: get-parent
+        run: |
+          BRANCHES=$(curl -s \
+            "https://console.neon.tech/api/v2/projects/${{ secrets.NEON_PROJECT_ID }}/branches" \
+            -H "Authorization: Bearer ${{ secrets.NEON_API_KEY }}")
+
+          PARENT_ID=$(echo $BRANCHES | jq -r '.branches[] | select(.name=="main") | .id')
+
+          if [ -z "$PARENT_ID" ] || [ "$PARENT_ID" = "null" ]; then
+            echo "❌ Branche main introuvable"
+            exit 1
+          fi
+
+          echo "PARENT_ID=$PARENT_ID" >> $GITHUB_ENV
+
+      - name: Create Neon branch
+        id: create-branch
+        run: |
+          echo "🚀 Création branche DB pour PR #${{ github.event.number }}"
+
+          RESPONSE=$(curl -s -X POST \
+            "https://console.neon.tech/api/v2/projects/${{ secrets.NEON_PROJECT_ID }}/branches" \
+            -H "Authorization: Bearer ${{ secrets.NEON_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"branch\": {
+                \"name\": \"pr-${{ github.event.number }}\",
+                \"parent_id\": \"$PARENT_ID\"
+              },
+              \"endpoints\": [{\"type\": \"read_write\"}]
+            }")
+
+          echo "$RESPONSE" | jq '.'
+
+          BRANCH_ID=$(echo $RESPONSE | jq -r '.branch.id')
+
+          if [ -z "$BRANCH_ID" ] || [ "$BRANCH_ID" = "null" ]; then
+            echo "❌ Erreur création branche"
+            exit 1
+          fi
+
+          echo "BRANCH_ID=$BRANCH_ID" >> $GITHUB_ENV
+          echo "✅ Branche créée : pr-${{ github.event.number }}"
+
+      - name: Comment PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ## 🗄️ Base de données éphémère créée
+
+            **Branche Neon** : `pr-${{ github.event.number }}`
+
+            ### 🧪 Pour tester localement :
+            1. Dans ton `.env` local :
+               ```bash
+               DATABASE_URL="<récupérer depuis Neon console, branche pr-${{ github.event.number }}>"
+               ```
+            2. `npx prisma migrate deploy && npm run dev`
+
+            ⚠️ Cette branche sera **automatiquement supprimée** à la fermeture de la PR.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
