@@ -4,6 +4,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.routes.js';
 import userStoryRoutes from './routes/userstory.routes.js';
 import sprintRoutes from './routes/sprint.routes.js';
+import passwordResetRoutes from './routes/passwordReset.js';
 import swaggerSpec from './config/swagger.js';
 import logger from './config/logger.js';
 
@@ -39,6 +40,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', passwordResetRoutes);
 app.use('/api/userstories', userStoryRoutes);
 app.use('/api/sprints', sprintRoutes);
 
