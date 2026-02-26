@@ -28,9 +28,9 @@ const getAll = async (req, res) => {
  */
 const create = async (req, res) => {
   try {
-    const { title, description, priority, status } = req.body;
+    const { title, description, priority, status, storyPoints } = req.body;
     const story = await prisma.userStory.create({
-      data: { title, description, priority, status, userId: req.userId }
+      data: { title, description, priority, status, storyPoints: storyPoints ?? null, userId: req.userId }
     });
     res.status(201).json(story);
   } catch (error) {
@@ -47,7 +47,7 @@ const create = async (req, res) => {
 const update = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, priority, status, position } = req.body;
+    const { title, description, priority, status, position, storyPoints } = req.body;
     
     const story = await prisma.userStory.findFirst({
       where: { id: parseInt(id), userId: req.userId }
@@ -59,7 +59,7 @@ const update = async (req, res) => {
     
     const updated = await prisma.userStory.update({
       where: { id: parseInt(id) },
-      data: { title, description, priority, status, position }
+      data: { title, description, priority, status, position, storyPoints: storyPoints ?? null }
     });
     
     res.json(updated);
