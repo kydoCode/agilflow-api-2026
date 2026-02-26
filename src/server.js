@@ -40,7 +40,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/auth', passwordResetRoutes);
+app.use('/api/password-reset', passwordResetRoutes);
 app.use('/api/userstories', userStoryRoutes);
 app.use('/api/sprints', sprintRoutes);
 

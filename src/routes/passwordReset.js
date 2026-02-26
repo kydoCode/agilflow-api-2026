@@ -3,7 +3,7 @@ import { forgotPassword, resetPassword } from '../controllers/passwordResetContr
 
 const router = express.Router();
 
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password', resetPassword);
+router.post('/forgot', forgotPassword);
+router.post('/reset', resetPassword);
 
 export default router;

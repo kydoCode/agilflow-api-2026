@@ -1,8 +1,11 @@
 node_modules/
 .env
+.env.test
+.env.backup
 *.log
 .DS_Store
 dist/
 build/
 db_dumps/
+backups/
 scripts/db-backup-manual.sh
