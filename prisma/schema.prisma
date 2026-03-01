@@ -54,6 +54,7 @@ model UserStory {
   status      UserStoryStatus   @default(BACKLOG)
   priority    UserStoryPriority @default(Medium)
   position    Int               @default(0)
+  storyPoints Int?
   Sprint      Sprint?           @relation(fields: [sprintId], references: [id])
   User        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 

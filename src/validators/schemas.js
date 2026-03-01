@@ -16,5 +16,6 @@ export const userStorySchema = z.object({
   title: z.string().min(3, 'Le titre doit contenir au moins 3 caractères'),
   description: z.string().optional(),
   priority: z.enum(['Low', 'Medium', 'High']).default('Medium'),
-  status: z.enum(['BACKLOG', 'TO_DO', 'DOING', 'TO_TEST', 'ISSUE', 'DONE']).default('BACKLOG')
+  status: z.enum(['BACKLOG', 'TO_DO', 'DOING', 'TO_TEST', 'ISSUE', 'DONE']).default('BACKLOG'),
+  storyPoints: z.number().int().nullable().optional()
 });
